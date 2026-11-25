@@ -1,0 +1,3 @@
+[submodule "hermes-ssh-workspaces"]
+	path = integrations/hermes-ssh-workspaces
+	url = https://github.com/HarrjyotSingh/hermes-ssh-workspaces.git

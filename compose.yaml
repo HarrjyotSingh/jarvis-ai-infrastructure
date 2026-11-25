@@ -1,0 +1,18 @@
+services:
+  chroma:
+    image: chromadb/chroma:1.5.3
+    volumes:
+      - chroma-data:/data
+  demo:
+    build:
+      context: .
+      dockerfile: demo/Dockerfile
+    depends_on:
+      - chroma
+    environment:
+      CHROMA_HOST: chroma
+    profiles:
+      - demo
+
+volumes:
+  chroma-data:

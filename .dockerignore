@@ -1,0 +1,7 @@
+**
+!demo/
+!demo/Dockerfile
+!demo/requirements.txt
+!demo/retrieval.py
+!demo/notes/
+!demo/notes/*.md
