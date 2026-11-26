@@ -12,6 +12,10 @@ This portfolio repo contains a small, runnable version of incremental retrieval 
 
 OpenCode and DSH use the same Qwen3.8 endpoint on the inference server. Hermes Desktop connects to the Hermes backend, where the SSH Workspaces plugin opens files on the other nodes. The wired network carries traffic between the machines, with Tailscale for remote access and configured fallback routes.
 
+## Setup and security
+
+The deployment examples show the vLLM launch settings, the ChromaDB and n8n storage stack, and the client configs that connect to the cluster. The guide covers the private network routes, OpenSSH controls, vault access checks, and runtime secrets. [Configuration and security guide](deployment/README.md)
+
 ## Memory and workload placement
 
 The storage node keeps ChromaDB and n8n available on 8 GB of RAM. A separate machine handles BGE-M3 and MobileCLIP embeddings, and the Radeon GPU server runs Qwen inference. The indexer processes up to 16 text chunks or one visual item per batch. I use the workstation GPU for jobs I can start and stop on demand.

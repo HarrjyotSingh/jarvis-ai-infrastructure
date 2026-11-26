@@ -1,0 +1,14 @@
+[Unit]
+Description=Jarvis speech API (%i)
+
+[Service]
+Type=simple
+WorkingDirectory=%h/services/jarvis/%i
+EnvironmentFile=%h/.config/jarvis/%i.env
+ExecStart=%h/services/jarvis/%i/.venv/bin/uvicorn app:app --host 127.0.0.1 --port ${PORT}
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

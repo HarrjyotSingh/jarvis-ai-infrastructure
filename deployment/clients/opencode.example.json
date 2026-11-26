@@ -1,0 +1,16 @@
+{
+  "model": "local-vllm/Qwen3.8",
+  "provider": {
+    "local-vllm": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Jarvis vLLM",
+      "options": {
+        "baseURL": "{env:JARVIS_MODEL_BASE_URL}",
+        "apiKey": "{env:VLLM_API_KEY}"
+      },
+      "models": {
+        "Qwen3.8": { "name": "Qwen3.8" }
+      }
+    }
+  }
+}

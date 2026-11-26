@@ -1,0 +1,17 @@
+- id: llm-pi-ai
+  config:
+    providers:
+      local-vllm:
+        displayName: Jarvis vLLM
+        api: openai-completions
+        apiKeyEnv: VLLM_API_KEY
+        baseURL: https://inference.example.invalid/v1
+        reasoning: medium
+        models:
+          - id: Qwen3.8
+            name: Qwen3.8
+            contextWindow: 216000
+            compat:
+              supportsReasoningEffort: true
+              thinkingFormat: qwen
+              maxTokensField: max_tokens

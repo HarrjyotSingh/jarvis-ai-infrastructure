@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "hosts": {
+    "storage": {
+      "provider": "ssh",
+      "user": "workspace-user",
+      "endpoints": [
+        "storage-lan.example.invalid",
+        "storage-tailnet.example.invalid"
+      ]
+    },
+    "senses": {
+      "provider": "ssh",
+      "user": "workspace-user",
+      "endpoints": [
+        "senses-lan.example.invalid",
+        "senses-tailnet.example.invalid"
+      ]
+    },
+    "workstation": {
+      "provider": "ssh",
+      "user": "workspace-user",
+      "endpoints": [
+        "workstation-lan.example.invalid",
+        "workstation-tailnet.example.invalid"
+      ]
+    }
+  },
+  "workspaces": {
+    "storage-notes": {
+      "label": "Storage notes",
+      "provider": "ssh",
+      "host": "storage",
+      "root": "/srv/jarvis/example-notes",
+      "enabled": true,
+      "index_markdown": true
+    },
+    "senses-services": {
+      "label": "Speech services",
+      "provider": "ssh",
+      "host": "senses",
+      "root": "/srv/jarvis/example-speech",
+      "enabled": true,
+      "index_markdown": false
+    },
+    "workstation-code": {
+      "label": "Workstation code",
+      "provider": "ssh",
+      "host": "workstation",
+      "root": "/srv/jarvis/example-code",
+      "enabled": true,
+      "index_markdown": false
+    }
+  }
+}
