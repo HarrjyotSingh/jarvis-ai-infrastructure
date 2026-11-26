@@ -16,13 +16,47 @@ OpenCode and DSH use the same Qwen3.8 endpoint on the inference server. Hermes D
 
 The deployment examples show the vLLM launch settings, the ChromaDB and n8n storage stack, and the client configs that connect to the cluster. The guide covers the private network routes, OpenSSH controls, vault access checks, and runtime secrets. [Configuration and security guide](deployment/README.md)
 
-## Memory and workload placement
+## Nodes and resource use
 
-The storage node keeps ChromaDB and n8n available on 8 GB of RAM. A separate machine handles BGE-M3 and MobileCLIP embeddings, and the Radeon GPU server runs Qwen inference. The indexer processes up to 16 text chunks or one visual item per batch. I use the workstation GPU for jobs I can start and stop on demand.
+Three server nodes stay on for inference, speech and embeddings, and storage. I spread those workloads across machines so a burst of model requests or indexing uses a separate RAM budget from ChromaDB and n8n. The workstation handles interactive work and can take extra GPU jobs on demand.
 
-On the live setup, Docker caps n8n at 1.25 GiB, the Nextcloud app at 1 GiB, and the Nextcloud database at 768 MiB. vLLM uses an FP8 KV cache and is configured for up to three concurrent sequences. The storage node uses compressed zram swap.
+### Node 1 · AI inference
 
-Before starting an extra job, I check available RAM against the job's upper limit during a busy period. The runbook uses a 4 GiB host reserve for extra workloads and calls for deferring a job if the host is already swapping heavily.
+| Resource | Live setup |
+| --- | --- |
+| Hardware | 16 GB RAM · Radeon AI PRO R9700 with 32 GB VRAM · Ubuntu |
+| Always-on services | vLLM serves Qwen3.8. Hermes, Obsidian Gateway, and Nextcloud AIO also run here. |
+| Spike controls | vLLM uses an FP8 KV cache and allows up to three concurrent sequences. Docker caps the Nextcloud app at 1 GiB and its database at 768 MiB. This host uses disk-backed swap. |
+
+### Node 2 · Senses and embeddings
+
+| Resource | Live setup |
+| --- | --- |
+| Hardware | 16 GB RAM · GeForce GTX 1650 with 4 GB VRAM · CachyOS |
+| Always-on services | BGE-M3 and MobileCLIP serve embeddings. Faster-Whisper, Piper, and SearXNG run on this node. |
+| Spike controls | The indexer sends batches of up to 16 text chunks or one visual item. zram absorbs some of the short-term RAM pressure when jobs overlap. |
+
+### Node 3 · Storage and automation
+
+| Resource | Live setup |
+| --- | --- |
+| Hardware | 8 GB RAM · dual-core Intel i3 · Debian |
+| Always-on services | ChromaDB holds the vector index and n8n runs workflows. The node keeps a vault replica and runs the Nextcloud office and preview workers. |
+| Spike controls | Docker caps n8n at 1.25 GiB. The office worker is capped at 768 MiB and the preview worker at 640 MiB. zram handles compressed swap, with disk swap also available. |
+
+### Node 4 · Developer workstation
+
+| Resource | Live setup |
+| --- | --- |
+| Hardware | 32 GB RAM · GeForce RTX 4070 with 8 GB VRAM · CachyOS |
+| Client workloads | OpenCode and DSH connect to the inference server. Hermes Desktop opens remote workspaces and Syncthing keeps a local vault copy. |
+| Overflow | I start and stop optional GPU jobs here to leave the server workloads running. The workstation also uses zram. |
+
+### How I handle spikes
+
+zram stores swapped pages compressed in RAM. In one check on the Senses node, about 3.9 GiB of pages occupied 2.2 GiB of physical memory, including overhead. Compression varies with the workload. [Linux kernel zram documentation](https://docs.kernel.org/admin-guide/blockdev/zram.html)
+
+Before starting an extra job, I check `MemAvailable` during a busy period. The runbook budgets the job's upper limit plus a 4 GiB host reserve. If a node is already swapping heavily, I defer the job or move it to the workstation when it fits there.
 
 ## Run the retrieval demo
 
